@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environnements virtuels
+.venv/
+venv/
+
+# Secrets et configuration locale
+.env
+.env.*
+!.env.example
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+logs/
+
+# Données locales
+data/raw/
+data/processed/
+
+# Windows
+Thumbs.db
+Desktop.ini
