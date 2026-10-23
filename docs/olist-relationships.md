@@ -20,7 +20,7 @@ Vérifier les relations avant la modélisation SQL Server
 ## Contrôles réalisés
 - Aucune clé primaire candidate nulle ou dupliquée
 - Aucune clé composite dupliquée dans order_items
-- Aucune référence étrangère orpheline détectée.
+- Aucune référence étrangère orpheline détectée...
 
 ## Commandes sans article
 
@@ -35,7 +35,7 @@ Vérifier les relations avant la modélisation SQL Server
 | shipped | 1 |
 
 Ces commandes seront conservées pendant l'exploration.
-Leur traitement métier sera défini dans l'ETL.
+Leur traitement métier sera défini dans l'ETL...
 
 ## Script
 src/check_relationships.py

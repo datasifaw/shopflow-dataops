@@ -11,9 +11,9 @@ Organiser le développement du projet avec Git, GitHub et Jira.
 ## Cycle de développement
 1. Sélectionner un ticket Jira et le passer en cours.
 2. Créer une branche depuis `main`.
-3. Développer et tester les modifications.
-4. Effectuer un commit avec une référence Jira.
-5. Pousser la branche sur GitHub.
+3. Développer et tester les modifications
+4. Effectuer un commit avec une référence Jira
+5. Pousser la branche sur GitHub
 6. Créer une Pull Request vers `main`.
 7. Vérifier les changements et les tests.
 8. Fusionner la Pull Request et clôturer le ticket Jira.

@@ -1,10 +1,10 @@
 # Inventaire du dataset Olist
 
 ## Objectif
-Inventorier les fichiers CSV utilisés dans ShopFlow DataOps.
+Inventorier les fichiers CSV utilisés dans ShopFlow DataOps
 
 ## Source
-Brazilian E-Commerce Public Dataset by Olist (Kaggle).
+Brazilian E-Commerce Public Dataset by Olist (Kaggle)
 
 ## Inventaire
 

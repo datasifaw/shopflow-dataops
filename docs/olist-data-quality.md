@@ -104,10 +104,10 @@ Les comparaisons ont été effectuées uniquement lorsque les deux dates concern
 1. Conserver les données brutes intactes dans `data/raw/`.
 2. Ne pas supprimer automatiquement les commandes avec des dates manquantes.
 3. Signaler les 166 cas de transport avant achat et les 23 cas de livraison avant transport.
-4. Conserver provisoirement les frais de livraison égaux à zéro.
+4. Conserver provisoirement les frais de livraison égaux à zéro
 5. Examiner les produits incomplets avant de définir des règles de remplacement ou d'exclusion.
-6. Prévoir un traitement explicite des anomalies dans la couche de transformation.
-7. Conserver la traçabilité des anomalies dans les futurs rapports de qualité.
+6. Prévoir un traitement explicite des anomalies dans la couche de transformation
+7. Conserver la traçabilité des anomalies dans les futurs rapports de qualité
 
 ## 8. Conclusion
 
