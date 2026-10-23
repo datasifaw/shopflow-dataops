@@ -1,7 +1,7 @@
 # Relations entre les tables Olist
 
 ## Objectif
-Vérifier les relations avant la modélisation SQL Server.
+Vérifier les relations avant la modélisation SQL Server
 
 ## Relations identifiées
 
@@ -18,8 +18,8 @@ Vérifier les relations avant la modélisation SQL Server.
 - order_items : (order_id, order_item_id)
 
 ## Contrôles réalisés
-- Aucune clé primaire candidate nulle ou dupliquée.
-- Aucune clé composite dupliquée dans order_items.
+- Aucune clé primaire candidate nulle ou dupliquée
+- Aucune clé composite dupliquée dans order_items
 - Aucune référence étrangère orpheline détectée.
 
 ## Commandes sans article

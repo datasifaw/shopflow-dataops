@@ -154,7 +154,7 @@ python src/check_relationships.py
 python src/check_data_quality.py
 ```
 
-## 🔄 Organisation Agile
+## 🔄 Organisation Agile :
 
 Le projet est suivi dans Jira à travers des tickets associés aux branches et aux commits Git.
 
@@ -166,7 +166,7 @@ Convention de branches :
 
 Les modifications sont intégrées dans `main` via Pull Request.
 
-## 🗺️ Prochaines étapes
+## 🗺️ Prochaines étapes /
 
 - [ ] SCRUM-18 — Analyser le schéma des données.
 - [ ] SCRUM-19 — Explorer des échantillons.
