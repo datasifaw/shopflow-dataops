@@ -1,4 +1,4 @@
-# 🛒 ShopFlow DataOps
+# 🛒 ShopFlow DataOps : 
 
 **Projet Data Engineering & DevOps — Pipeline ETL E-commerce**
 
