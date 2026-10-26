@@ -1,7 +1,7 @@
 # Relations entre les tables Olist
 
 ## Objectif
-Vérifier les relations avant la modélisation SQL Server
+Vérifier les relations avant la modélisation SQL Server !!
 
 ## Relations identifiées
 
