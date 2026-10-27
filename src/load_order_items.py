@@ -5,6 +5,7 @@ from decimal import Decimal, InvalidOperation
 import pandas as pd
 import pyodbc
 
+from src.data_validation import validate_order_items
 
 ROOT = Path(__file__).resolve().parent.parent
 CSV_PATH = ROOT / "data" / "raw" / "olist_order_items_dataset.csv"
@@ -44,48 +45,12 @@ def main():
     # 1. Extraction
     df = pd.read_csv(CSV_PATH, dtype="string")
     print(f"Articles lus : {len(df)}")
+    
+     # Validation centralisee
+    validate_order_items(df)
+    print("Validation des articles reussie.")
 
-    # 2. Validation des colonnes
-    if list(df.columns) != COLUMNS:
-        raise ValueError("Colonnes CSV inattendues.")
-
-    if df.isna().any().any():
-        raise ValueError("Valeurs obligatoires manquantes.")
-
-    # 3. Validation des identifiants
-    for column in ["order_id", "product_id", "seller_id"]:
-        if (df[column].str.len() != 32).any():
-            raise ValueError(f"Identifiant invalide : {column}")
-
-    item_ids = pd.to_numeric(
-        df["order_item_id"], errors="raise"
-    )
-
-    if (
-        (item_ids % 1 != 0).any()
-        or (item_ids < 1).any()
-        or (item_ids > 2147483647).any()
-    ):
-        raise ValueError("order_item_id invalide.")
-
-    df["order_item_id"] = item_ids.astype("int64")
-
-    if df.duplicated(
-        subset=["order_id", "order_item_id"]
-    ).any():
-        raise ValueError("Cle primaire composite en doublon.")
-
-    # 4. Validation des dates
-    dates = pd.to_datetime(
-        df["shipping_limit_date"],
-        format="%Y-%m-%d %H:%M:%S",
-        errors="coerce",
-    )
-
-    if dates.isna().any():
-        raise ValueError("Dates shipping_limit_date invalides.")
-
-    df["shipping_limit_date"] = dates
+    
 
     # 5. Preparation des enregistrements
     rows = []

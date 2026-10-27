@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 import pyodbc
+from src.data_validation import validate_products
 
 
 # Configuration
@@ -38,43 +39,16 @@ def main():
     print(f"Produits lus : {len(df)}")
 
     # 2. Validation
-    if list(df.columns) != COLUMNS:
-        raise ValueError("Colonnes inattendues dans le CSV.")
 
-    if df["product_id"].isna().any():
-        raise ValueError("product_id manquant.")
+    
+    # 2. Validation centralisee
+    validate_products(df)
 
-    if df["product_id"].duplicated().any():
-        raise ValueError("product_id en doublon.")
-
-    if (df["product_id"].str.len() > 32).any():
-        raise ValueError("product_id trop long.")
-
-    categories = df["product_category_name"].dropna()
-
-    if (categories.str.len() > 100).any():
-        raise ValueError("Categorie trop longue.")
-
-    for column in NUMERIC_COLUMNS:
-        values = pd.to_numeric(df[column], errors="raise")
-        non_null = values.dropna()
-
-        if ((non_null % 1) != 0).any():
-            raise ValueError(
-                f"Valeur non entiere dans {column}"
-            )
-
-        if ((non_null < -2147483648) |
-            (non_null > 2147483647)).any():
-            raise ValueError(
-                f"Valeur hors plage INT : {column}"
-            )
-
-        df[column] = values
-
-    print("Validation reussie.")
+    print("Validation des produits reussie.")
     print("Valeurs NULL par colonne :")
     print(df.isna().sum().to_string())
+
+   
 
     # 3. Preparation des lignes
     rows = []
