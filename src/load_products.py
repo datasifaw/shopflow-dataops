@@ -26,6 +26,27 @@ NUMERIC_COLUMNS = COLUMNS[2:]
 BATCH_SIZE = 1000
 
 
+def prepare_product_rows(df):
+    validate_products(df)
+
+    rows = []
+
+    for record in df.itertuples(index=False, name=None):
+        values = []
+
+        for index, value in enumerate(record):
+            if pd.isna(value):
+                values.append(None)
+            elif index >= 2:
+                values.append(int(value))
+            else:
+                values.append(str(value))
+
+        rows.append(tuple(values))
+
+    return rows
+
+
 def main():
     # 1. Extraction
     df = pd.read_csv(
@@ -51,7 +72,7 @@ def main():
    
 
     # 3. Preparation des lignes
-    rows = []
+    rows = prepare_product_rows(df)
 
     for record in df.itertuples(index=False, name=None):
         values = []

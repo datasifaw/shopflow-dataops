@@ -4,7 +4,6 @@ from pathlib import Path
 import pandas as pd
 import pyodbc
 
-
 from src.data_validation import validate_orders
 
 
@@ -23,58 +22,32 @@ COLUMNS = [
 ]
 
 DATE_COLUMNS = COLUMNS[3:]
-REQUIRED_DATES = [
-    "order_purchase_timestamp",
-    "order_estimated_delivery_date",
-]
 
 BATCH_SIZE = 1000
 
 
-def main():
-    # Extraction
-    df = pd.read_csv(CSV_PATH, dtype="string")
+def prepare_order_rows(df: pd.DataFrame) -> list[tuple]:
+    """
+    Valide les commandes et prépare les lignes pour SQL Server.
 
-    print(f"Commandes lues : {len(df)}")
-
-   
-    # Validation centralisee des commandes
+    Aucune connexion SQL et aucune insertion.
+    """
     validate_orders(df)
 
-    print("Validation des commandes reussie.")
-
+    prepared = df.copy()
 
     # Conversion des dates
     for column in DATE_COLUMNS:
-        original = df[column]
-
-        parsed = pd.to_datetime(
-            original,
+        prepared[column] = pd.to_datetime(
+            prepared[column],
             format="%Y-%m-%d %H:%M:%S",
-            errors="coerce",
+            errors="raise",
         )
 
-        invalid = original.notna() & parsed.isna()
-
-        if invalid.any():
-            raise ValueError(
-                f"{invalid.sum()} dates invalides : {column}"
-            )
-
-        df[column] = parsed
-
-    for column in REQUIRED_DATES:
-        if df[column].isna().any():
-            raise ValueError(
-                f"Date obligatoire manquante : {column}"
-            )
-
-    print("Validation des commandes reussie.")
-
-    # Preparation des enregistrements SQL
+    # Preparation des valeurs Python compatibles pyodbc
     rows = []
 
-    for record in df.itertuples(index=False, name=None):
+    for record in prepared.itertuples(index=False, name=None):
         values = []
 
         for value in record:
@@ -87,7 +60,22 @@ def main():
 
         rows.append(tuple(values))
 
-    # Connexion SQL Server
+    return rows
+
+
+def main():
+    # 1. Extraction
+    df = pd.read_csv(CSV_PATH, dtype="string")
+
+    print(f"Commandes lues : {len(df)}")
+
+    # 2. Validation et transformation centralisees
+    rows = prepare_order_rows(df)
+
+    print("Validation des commandes reussie.")
+    print(f"Commandes preparees : {len(rows)}")
+
+    # 3. Recherche du pilote SQL Server
     drivers = pyodbc.drivers()
 
     if "ODBC Driver 18 for SQL Server" in drivers:
@@ -95,8 +83,11 @@ def main():
     elif "ODBC Driver 17 for SQL Server" in drivers:
         driver = "ODBC Driver 17 for SQL Server"
     else:
-        raise RuntimeError("Pilote ODBC SQL Server introuvable.")
+        raise RuntimeError(
+            "Pilote ODBC SQL Server introuvable."
+        )
 
+    # 4. Configuration de la connexion SQL Server
     connection_string = (
         f"DRIVER={{{driver}}};"
         r"SERVER=.\SQLEXPRESS;"
@@ -106,6 +97,7 @@ def main():
         "TrustServerCertificate=yes;"
     )
 
+    # 5. Requete d'insertion
     placeholders = ", ".join(["?"] * len(COLUMNS))
     columns_sql = ", ".join(COLUMNS)
 
@@ -114,6 +106,7 @@ def main():
         f"VALUES ({placeholders})"
     )
 
+    # 6. Connexion SQL Server
     connection = pyodbc.connect(
         connection_string,
         autocommit=False,
@@ -123,19 +116,21 @@ def main():
     try:
         cursor = connection.cursor()
 
-        # Refuser le chargement si la table est remplie
+        # Refuser le chargement si des commandes existent
         cursor.execute("SELECT COUNT(*) FROM dbo.orders")
         existing = cursor.fetchone()[0]
 
         if existing != 0:
             raise RuntimeError(
-                f"Chargement refuse : {existing} commandes existent."
+                f"Chargement refuse : "
+                f"{existing} commandes existent."
             )
 
-        # Verifier les clients avant insertion
+        # Verifier que les clients sont deja charges
         cursor.execute(
             "SELECT COUNT(*) FROM dbo.customers"
         )
+
         customers_count = cursor.fetchone()[0]
 
         if customers_count == 0:
@@ -143,7 +138,7 @@ def main():
                 "Charger customers avant orders."
             )
 
-        # Chargement transactionnel par lots
+        # 7. Chargement transactionnel par lots
         for start in range(0, len(rows), BATCH_SIZE):
             batch = rows[start:start + BATCH_SIZE]
 
@@ -155,7 +150,11 @@ def main():
                 f"/{len(rows)}"
             )
 
-        cursor.execute("SELECT COUNT(*) FROM dbo.orders")
+        # 8. Verification du volume
+        cursor.execute(
+            "SELECT COUNT(*) FROM dbo.orders"
+        )
+
         loaded = cursor.fetchone()[0]
 
         if loaded != len(df):
@@ -163,8 +162,12 @@ def main():
                 f"Volume incorrect : {loaded} != {len(df)}"
             )
 
+        # 9. Validation de la transaction
         connection.commit()
-        print(f"Chargement termine : {loaded} commandes.")
+
+        print(
+            f"Chargement termine : {loaded} commandes."
+        )
 
     except Exception:
         connection.rollback()
