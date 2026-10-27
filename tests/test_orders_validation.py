@@ -75,3 +75,11 @@ def test_missing_required_delivery_estimate():
 
     with pytest.raises(ValueError, match="obligatoire"):
         validate_orders(df)
+
+
+
+
+def test_orders_loader_uses_shared_validator():
+    from src.load_orders import validate_orders as loader_validator
+
+    assert loader_validator is validate_orders

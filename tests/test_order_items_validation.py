@@ -62,3 +62,10 @@ def test_excessive_price_decimals():
 
     with pytest.raises(ValueError, match="trop de decimales"):
         validate_order_items(df)
+
+
+
+def test_order_items_loader_uses_shared_validator():
+    from src.load_order_items import validate_order_items as loader_validator
+
+    assert loader_validator is validate_order_items

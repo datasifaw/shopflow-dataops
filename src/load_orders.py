@@ -5,6 +5,9 @@ import pandas as pd
 import pyodbc
 
 
+from src.data_validation import validate_orders
+
+
 ROOT = Path(__file__).resolve().parent.parent
 CSV_PATH = ROOT / "data" / "raw" / "olist_orders_dataset.csv"
 
@@ -34,25 +37,12 @@ def main():
 
     print(f"Commandes lues : {len(df)}")
 
-    # Validation des colonnes et identifiants
-    if list(df.columns) != COLUMNS:
-        raise ValueError("Structure CSV inattendue.")
+   
+    # Validation centralisee des commandes
+    validate_orders(df)
 
-    for column in ["order_id", "customer_id", "order_status"]:
-        if df[column].isna().any():
-            raise ValueError(f"Valeur manquante : {column}")
+    print("Validation des commandes reussie.")
 
-    if df["order_id"].duplicated().any():
-        raise ValueError("order_id en doublon.")
-
-    if (df["order_id"].str.len() > 32).any():
-        raise ValueError("order_id trop long.")
-
-    if (df["customer_id"].str.len() > 32).any():
-        raise ValueError("customer_id trop long.")
-
-    if (df["order_status"].str.len() > 20).any():
-        raise ValueError("order_status trop long.")
 
     # Conversion des dates
     for column in DATE_COLUMNS:

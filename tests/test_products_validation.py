@@ -62,3 +62,11 @@ def test_missing_product_column():
 
     with pytest.raises(ValueError, match="Colonnes"):
         validate_products(df)
+
+
+
+
+def test_products_loader_uses_shared_validator():
+    from src.load_products import validate_products as loader_validator
+
+    assert loader_validator is validate_products
