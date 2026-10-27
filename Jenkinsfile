@@ -27,11 +27,14 @@ pipeline {
             }
         }
 
+        
+        
         stage('Run Pytest') {
             steps {
-                sh '.venv/bin/python -m pytest -v --junitxml=test-results/results.xml'
+                sh '.venv/bin/python -m pytest tests/ -v --junitxml=test-results/results.xml'
             }
         }
+
     }
 
     post {
