@@ -49,3 +49,12 @@ def test_missing_column():
 
     with pytest.raises(ValueError, match="Colonnes"):
         validate_customers(df)
+
+
+
+
+def test_customer_loader_uses_shared_validator():
+    from src.load_customers import validate_customers as loader_validator
+    from src.data_validation import validate_customers as shared_validator
+
+    assert loader_validator is shared_validator

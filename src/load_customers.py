@@ -4,6 +4,9 @@ from pathlib import Path
 import pandas as pd
 import pyodbc
 
+from src.data_validation import validate_customers
+
+
 
 # Configuration
 ROOT = Path(__file__).resolve().parent.parent
@@ -36,21 +39,13 @@ def main():
     print(f"Lignes lues : {len(df)}")
 
     # 2. Validation
-    if list(df.columns) != EXPECTED_COLUMNS:
-        raise ValueError("Colonnes du CSV inattendues.")
 
-    if df[EXPECTED_COLUMNS].isna().any().any():
-        raise ValueError("Valeurs obligatoires manquantes.")
-
-    if df["customer_id"].duplicated().any():
-        raise ValueError("customer_id en doublon.")
-
-    if not df["customer_zip_code_prefix"].str.fullmatch(
-        r"\d{5}"
-    ).all():
-        raise ValueError("Prefixe postal invalide.")
+    
+    validate_customers(df)
 
     print("Validation des donnees reussie.")
+
+    
 
     # 3. Connexion SQL Server
     drivers = pyodbc.drivers()
