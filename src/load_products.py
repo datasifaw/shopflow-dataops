@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 import pyodbc
+
 from src.data_validation import validate_products
 
 
@@ -26,7 +27,12 @@ NUMERIC_COLUMNS = COLUMNS[2:]
 BATCH_SIZE = 1000
 
 
-def prepare_product_rows(df):
+def prepare_product_rows(df: pd.DataFrame) -> list[tuple]:
+    """
+    Valide les produits et prepare les lignes pour SQL Server.
+
+    Aucune connexion SQL et aucune insertion.
+    """
     validate_products(df)
 
     rows = []
@@ -59,35 +65,15 @@ def main():
 
     print(f"Produits lus : {len(df)}")
 
-    # 2. Validation
-
-    
-    # 2. Validation centralisee
-    validate_products(df)
+    # 2. Validation et preparation centralisees
+    rows = prepare_product_rows(df)
 
     print("Validation des produits reussie.")
     print("Valeurs NULL par colonne :")
     print(df.isna().sum().to_string())
+    print(f"Produits prepares : {len(rows)}")
 
-   
-
-    # 3. Preparation des lignes
-    rows = prepare_product_rows(df)
-
-    for record in df.itertuples(index=False, name=None):
-        values = []
-
-        for index, value in enumerate(record):
-            if pd.isna(value):
-                values.append(None)
-            elif index >= 2:
-                values.append(int(value))
-            else:
-                values.append(str(value))
-
-        rows.append(tuple(values))
-
-    # 4. Connexion SQL Server
+    # 3. Recherche du pilote SQL Server
     drivers = pyodbc.drivers()
 
     if "ODBC Driver 18 for SQL Server" in drivers:
@@ -95,8 +81,11 @@ def main():
     elif "ODBC Driver 17 for SQL Server" in drivers:
         driver = "ODBC Driver 17 for SQL Server"
     else:
-        raise RuntimeError("Pilote SQL Server introuvable.")
+        raise RuntimeError(
+            "Pilote SQL Server introuvable."
+        )
 
+    # 4. Configuration SQL Server
     connection_string = (
         f"DRIVER={{{driver}}};"
         r"SERVER=.\SQLEXPRESS;"
@@ -114,7 +103,7 @@ def main():
         f"VALUES ({placeholders})"
     )
 
-    # 5. Chargement transactionnel
+    # 5. Connexion SQL Server
     connection = pyodbc.connect(
         connection_string,
         autocommit=False,
@@ -124,7 +113,11 @@ def main():
     try:
         cursor = connection.cursor()
 
-        cursor.execute("SELECT COUNT(*) FROM dbo.products")
+        # Refuser les doubles chargements
+        cursor.execute(
+            "SELECT COUNT(*) FROM dbo.products"
+        )
+
         existing_count = cursor.fetchone()[0]
 
         if existing_count != 0:
@@ -133,6 +126,7 @@ def main():
                 "produits existent deja."
             )
 
+        # 6. Insertion transactionnelle par lots
         for start in range(0, len(rows), BATCH_SIZE):
             batch = rows[start:start + BATCH_SIZE]
 
@@ -144,16 +138,20 @@ def main():
                 f"/{len(rows)}"
             )
 
+        # 7. Controle du volume
         cursor.execute(
             "SELECT COUNT(*) FROM dbo.products"
         )
+
         loaded_count = cursor.fetchone()[0]
 
-        if loaded_count != len(df):
+        if loaded_count != len(rows):
             raise RuntimeError(
-                f"Volume incorrect : {loaded_count}"
+                f"Volume incorrect : "
+                f"{loaded_count} != {len(rows)}"
             )
 
+        # 8. Validation de la transaction
         connection.commit()
 
         print(
