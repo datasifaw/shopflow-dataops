@@ -2,7 +2,7 @@
 # ShopFlow DataOps
 ## 🏗️ Architecture Générale
 
-![Architecture ShopFlow DataOps](docs/images/shopflow-architecture.png)
+![Architecture ShopFlow DataOps](docs/images/Architecture_Générale.png)
 ### End-to-End E-commerce Data Engineering Project
 
 ![Python](https://img.shields.io/badge/Python-ETL-blue)
