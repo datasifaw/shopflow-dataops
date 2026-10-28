@@ -1,183 +1,231 @@
-# 🛒 ShopFlow DataOps  : E-Commerce FLOW
 
-**Projet Data Engineering & DevOps — Pipeline ETL E-commerce**
+# ShopFlow DataOps
 
-## 📌 Présentation
+### End-to-End E-commerce Data Engineering Project
 
-ShopFlow DataOps est un projet de Data Engineering visant à construire un pipeline ETL automatisé pour traiter, contrôler, transformer et charger des données e-commerce dans Microsoft SQL Server.
+![Python](https://img.shields.io/badge/Python-ETL-blue)
+![SQL Server](https://img.shields.io/badge/SQL_Server-Data_Warehouse-red)
+![Docker](https://img.shields.io/badge/Docker-Containerization-blue)
+![Jenkins](https://img.shields.io/badge/Jenkins-CI-orange)
+![Power BI](https://img.shields.io/badge/Power_BI-Analytics-yellow)
 
-Le projet applique progressivement les bonnes pratiques DevOps : Git, GitHub, branches de fonctionnalités, Pull Requests, Docker, Jenkins CI/CD et gestion Agile avec Jira Scrum.
+## Overview
 
-## 🎯 Objectifs
+ShopFlow DataOps is an end-to-end Data Engineering portfolio project
+built using the Brazilian E-Commerce Public Dataset by Olist.
 
-- Collecter des données e-commerce historiques et synthétiques.
-- Explorer et contrôler la qualité des données.
-- Identifier les relations entre les tables.
-- Concevoir un modèle relationnel SQL Server.
-- Développer un pipeline ETL Python et Pandas.
-- Automatiser les tests avec Pytest.
-- Conteneuriser l'application avec Docker.
-- Mettre en place un pipeline CI/CD avec Jenkins.
-- Piloter le développement avec Jira et Scrum.
+The project covers the complete data lifecycle:
 
-## 🛠️ Technologies
+- Data extraction and validation with Python and Pandas
+- ETL loading into Microsoft SQL Server
+- Transactional database design and data quality controls
+- Dimensional modeling with a star schema
+- SQL analytics and business KPIs
+- Automated testing with pytest
+- Continuous Integration using Jenkins and Docker
+- Interactive business reporting with Power BI
 
-| Technologie | Utilisation |
-|---|---|
-| Python 3.14 | Développement des scripts |
-| Pandas | Exploration et contrôle des données |
-| SQL Server | Base de données cible (à venir) |
-| Git / GitHub | Versionnement et Pull Requests |
-| Jira / Scrum | Gestion Agile du projet |
-| Pytest | Tests automatisés (à venir) |
-| Docker | Conteneurisation (à venir) |
-| Jenkins | Pipeline CI/CD (à venir) |
-| Faker | Données synthétiques (à venir) |
+## Architecture
 
-## 📂 Structure du projet
+```text
+Olist CSV Files
+      |
+      v
+Python + Pandas
+Data Validation
+      |
+      v
+Microsoft SQL Server
+dbo.customers
+dbo.products
+dbo.orders
+dbo.order_items
+      |
+      v
+Data Warehouse (dw)
+dim_customer
+dim_product
+dim_date
+dim_order
+fact_sales
+      |
+      v
+Analytical SQL Views
+Revenue Summary
+Monthly Sales
+Top Categories
+Sales by State
+      |
+      v
+Power BI Dashboard
+```
+
+## Technologies
+
+| Technology | Purpose |
+|------------|---------|
+| Python | ETL development |
+| Pandas | CSV processing and transformations |
+| pyodbc | SQL Server connectivity |
+| SQL Server | Data storage and dimensional warehouse |
+| pytest | Automated data quality and ETL tests |
+| Docker | Jenkins execution environment |
+| Jenkins | Continuous Integration |
+| Power BI | Business Intelligence reporting |
+| GitHub | Version control and collaboration |
+| Jira | Agile project management |
+
+## Dataset
+
+Source: Olist Brazilian E-Commerce Public Dataset.
+
+Four primary datasets are used:
+
+| Dataset | Records |
+|---------|--------:|
+| Customers | 99,441 |
+| Products | 32,951 |
+| Orders | 99,441 |
+| Order Items | 112,650 |
+
+Raw CSV files are excluded from Git version control.
+
+## Data Warehouse
+
+The warehouse uses the `dw` schema in SQL Server.
+
+### Dimensions
+
+- `dw.dim_customer`
+- `dw.dim_product`
+- `dw.dim_date`
+- `dw.dim_order`
+
+### Fact Table
+
+- `dw.fact_sales`
+
+Grain: one order item per row.
+
+The warehouse contains 112,650 sales fact records.
+
+### Reconciliation
+
+Source and warehouse values have been reconciled:
+
+- Product amount: BRL 13,591,643.70
+- Freight amount: BRL 2,251,909.54
+- Total amount: BRL 15,843,553.24
+- Reconciliation difference: BRL 0.00
+
+These figures include all order statuses.
+
+## Business Analytics
+
+Four analytical SQL views support Power BI:
+
+- `dw.vw_revenue_summary`
+- `dw.vw_monthly_sales`
+- `dw.vw_top_categories`
+- `dw.vw_sales_by_state`
+
+Delivered orders only:
+
+| KPI | Result |
+|-----|-------:|
+| Delivered orders | 96,478 |
+| Delivered order items | 110,197 |
+| Product revenue | BRL 13,221,498.11 |
+| Freight revenue | BRL 2,198,275.64 |
+| Total including freight | BRL 15,419,773.75 |
+
+## Power BI Dashboard
+
+The ShopFlow dashboard presents:
+
+- Product revenue in EUR
+- Total revenue including freight in EUR
+- Delivered order count
+- Average order value
+- Monthly sales evolution
+- Top 10 product categories
+- Sales by Brazilian state
+
+![ShopFlow Power BI Dashboard](docs/images/shopflow-powerbi-dashboard.png)
+
+EUR conversion uses a fixed indicative rate:
+1 EUR = 5.9624 BRL.
+
+This is a demonstration rate, not a historical transaction rate.
+
+## Automated Testing
+
+The project includes 41 pytest tests covering:
+
+- Data validation
+- CSV extraction and transformation
+- SQL loader protections using mocks
+- Transaction rollback and commit scenarios
+
+Run the test suite:
+
+```powershell
+python -m pytest -v
+```
+
+## Continuous Integration
+
+A Jenkins pipeline runs inside Docker and performs:
+
+1. Environment verification
+2. Python virtual environment creation
+3. Dependency installation
+4. Automated pytest execution
+5. JUnit test reporting
+
+The Jenkins job monitors GitHub `main` using Poll SCM.
+
+## Repository Structure
 
 ```text
 shopflow-dataops/
-│
-├── data/
-│   ├── raw/                     # CSV Olist locaux
-│   └── processed/               # Futures données transformées
-│
-├── src/
-│   ├── inspect_olist.py
-│   ├── check_relationships.py
-│   └── check_data_quality.py
-│
-├── docs/
-│   ├── git-workflow.md
-│   ├── olist-inventory.md
-│   ├── olist-relationships.md
-│   └── olist-data-quality.md
-│
-├── sql/
-├── tests/
-├── docker/
-├── jenkins/
-│
-├── .gitignore
-└── README.md
+|
+|-- data/
+|   |-- raw/               # Ignored source CSV files
+|
+|-- src/                   # ETL and validation scripts
+|-- tests/                 # Automated pytest suite
+|-- sql/
+|   |-- analytics/         # Transactional analytics
+|   |-- warehouse/         # Warehouse DDL and ETL
+|       |-- analytics/     # Warehouse analytical views
+|
+|-- docker/
+|   |-- jenkins/
+|
+|-- docs/
+|   |-- images/
+|
+|-- powerbi/
+|   |-- ShopFlow_Ecommerce_Analytics.pbix
+|
+|-- Jenkinsfile
+|-- requirements.txt
+|-- pytest.ini
+|-- README.md
 ```
 
-Les fichiers CSV bruts et l'environnement virtuel `.venv` sont exclus du dépôt GitHub.
+## Project Highlights
 
-## 📊 Source des données
+- End-to-end pipeline from CSV to dashboard
+- SQL Server transactional and dimensional modeling
+- Centralized data validation
+- Financial reconciliation between source and warehouse
+- Automated CI testing with Docker and Jenkins
+- Power BI reporting with EUR-converted business indicators
+- Agile delivery with Jira tickets and GitHub Pull Requests
 
-**Brazilian E-Commerce Public Dataset by Olist**
+## Author
 
-Source : https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
-
-Le dataset contient neuf fichiers CSV représentant les commandes, clients, produits, paiements, avis, vendeurs et données géographiques.
-
-Des données synthétiques seront également générées avec Python et Faker dans une prochaine phase.
-
-## ✅ Travaux réalisés
-
-### Sprint 1 — Fondations & Git
-
-- Création du dépôt GitHub.
-- Initialisation de Git local.
-- Configuration du `.gitignore`.
-- Création de la structure du projet.
-- Définition de la stratégie de branches.
-- Mise en place du workflow Git : branche, commit, push, Pull Request et merge.
-
-### Sprint 2 — Exploration et Data Quality
-
-**SCRUM-14 — Acquisition Olist**
-- Téléchargement et organisation des neuf CSV Olist.
-
-**SCRUM-15 — Inventaire**
-- Script `inspect_olist.py`.
-- Inventaire des fichiers, lignes et colonnes.
-
-**SCRUM-16 — Relations**
-- Script `check_relationships.py`.
-- Analyse des relations entre commandes, clients, produits et articles.
-- Vérification des clés primaires candidates et des clés étrangères.
-- Identification de 775 commandes sans article.
-
-**SCRUM-17 — Qualité des données**
-- Script `check_data_quality.py`.
-- Analyse des doublons et valeurs manquantes.
-- Contrôle des prix et frais de livraison.
-- Contrôle de la cohérence chronologique.
-- Rédaction du rapport qualité.
-
-## 🔎 Principaux résultats Data Quality
-
-| Contrôle | Résultat |
-|---|---:|
-| Commandes analysées | 99 441 |
-| Lignes d'articles | 112 650 |
-| Produits | 32 951 |
-| Doublons complets dans les 4 fichiers analysés | 0 |
-| Commandes sans article | 775 |
-| Prix négatifs | 0 |
-| Frais de livraison nuls | 383 |
-| Remises au transporteur avant achat | 166 |
-| Livraisons avant remise au transporteur | 23 |
-
-Les anomalies identifiées sont documentées et seront prises en compte lors de la conception des règles ETL.
-
-## ▶️ Exécution locale
-
-Prérequis : Python et les neuf fichiers CSV Olist placés dans `data/raw/`.
-
-Créer l'environnement virtuel :
-
-```powershell
-python -m venv .venv
+Developed as a hands-on Data Engineering portfolio project.
 ```
-
-L'activer sous PowerShell :
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-Installer Pandas :
-
-```powershell
-python -m pip install pandas
-```
-
-Lancer les scripts :
-
-```powershell
-python src/inspect_olist.py
-python src/check_relationships.py
-python src/check_data_quality.py
-```
-
-## 🔄 Organisation Agile :
-
-Le projet est suivi dans Jira à travers des tickets associés aux branches et aux commits Git.
-
-Convention de branches :
-
-- `main` : version stable.
-- `feature/SCRUM-ID-description` : fonctionnalités.
-- `fix/SCRUM-ID-description` : corrections.
-
-Les modifications sont intégrées dans `main` via Pull Request.
-
-## 🗺️ Prochaines étapes /
-
-- [ ] SCRUM-18 — Analyser le schéma des données.
-- [ ] SCRUM-19 — Explorer des échantillons.
-- [ ] SCRUM-20 — Finaliser les observations d'exploration.
-- [ ] Concevoir les tables SQL Server.
-- [ ] Développer les transformations ETL.
-- [ ] Ajouter les tests Pytest.
-- [ ] Intégrer Docker.
-- [ ] Automatiser la CI/CD avec Jenkins.
-- [ ] Générer des données synthétiques avec Faker.
-
-## 📄 Statut
-
-Projet en développement — Sprint 2 : exploration des données et préparation de la modélisation SQL Server.
