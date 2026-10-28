@@ -1,6 +1,8 @@
 
 # ShopFlow DataOps
+## 🏗️ Architecture Générale
 
+![Architecture ShopFlow DataOps](docs/images/shopflow-architecture.png)
 ### End-to-End E-commerce Data Engineering Project
 
 ![Python](https://img.shields.io/badge/Python-ETL-blue)
