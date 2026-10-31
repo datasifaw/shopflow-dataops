@@ -1,6 +1,6 @@
 
 # ShopFlow DataOps
-## 🏗️
+
 
 ![Architecture ShopFlow DataOps](docs/images/Architecture_Générale.png)
 ### End-to-End E-commerce Data Engineering Project
