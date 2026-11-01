@@ -1,5 +1,5 @@
 
-# ShopFlow DataOps :
+# ShopFlow DataOps
 
 
 ![Architecture ShopFlow DataOps](docs/images/Architecture_Générale.png)
