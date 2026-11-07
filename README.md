@@ -15,7 +15,7 @@
 ShopFlow DataOps is an end-to-end Data Engineering portfolio project
 built using the Brazilian E-Commerce Public Dataset by Olist.
 
-The project covers the complete data lifecycle:
+The project covers the complete data lifecycle
 
 - Data extraction and validation with Python and Pandas
 - ETL loading into Microsoft SQL Server
